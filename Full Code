@@ -1,0 +1,100 @@
+#include <SoftwareSerial.h>
+
+// HC-05 Bluetooth module
+SoftwareSerial Bluetooth(8, 8);  // RX, TX
+
+// Motor driver pins
+#define IN1 5
+#define IN2 6
+#define IN3 12
+#define IN4 13
+
+char command;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);     // Debugging
+  Bluetooth.begin(9600);  // Bluetooth module baud rate
+
+  // Initialize motor driver pins
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  // Stop motors initially
+  stopMotors();
+  Serial.println("System ready. Waiting for Bluetooth commands...");
+}
+
+void loop() {
+
+  // Check for Bluetooth commands
+  if (Bluetooth.available()) {
+    command = Bluetooth.read();  // Read the command
+    Serial.print("Command received: ");
+    Serial.println(command);
+
+    switch (command) {
+      case 'F':
+        goForward();
+        break;
+      case 'B':
+        goBackward();
+        break;
+      case 'L':
+        turnLeft();
+        break;
+      case 'R':
+        turnRight();
+        break;
+      case 'S':
+        stopMotors();
+        break;
+      default:
+        Serial.println("Invalid command.");
+        break;
+    }
+  }
+}
+
+// Motor control functions
+void turnRight() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  Serial.println("Right...");
+}
+
+void turnLeft() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  Serial.println("Left...");
+}
+
+void goForward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  Serial.println("Forward...");
+}
+
+void goBackward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  Serial.println("Backward...");
+}
+
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  Serial.println("Motors stopped.");
+}
